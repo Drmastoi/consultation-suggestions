@@ -124,11 +124,11 @@
     .chips-scroll::-webkit-scrollbar { display: none; }
     .chip {
       display: inline-block;
-      padding: 3px 8px;
-      border-radius: 16px;
+      padding: 4px 10px;
+      border-radius: 18px;
       background: var(--chip-bg);
       border: 1px solid var(--chip-border);
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 500;
       color: var(--text-primary);
       cursor: pointer;
@@ -403,7 +403,25 @@
 
       .desktop-wrapper {
         display: flex;
+        flex-direction: column;
         height: 100vh;
+        overflow: hidden;
+      }
+
+      /* Full-width chips bar */
+      .desktop-chips-bar {
+        background: #FFFFFF;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .desktop-chips-bar .chips-scroll {
+        padding: 6px 12px;
+      }
+
+      /* Panels row */
+      .desktop-panels {
+        display: flex;
+        flex: 1;
         overflow: hidden;
       }
 
@@ -431,10 +449,6 @@
       .desktop-left .search-container {
         margin: 4px 8px 0;
         height: 30px;
-      }
-
-      .desktop-left .chips-scroll {
-        padding: 3px 8px;
       }
 
       .desktop-left .result-count {
@@ -575,52 +589,57 @@
 
 <!-- ═══════════════ DESKTOP: Two-Panel Layout ═══════════════ -->
 <div class="desktop-wrapper" id="desktopWrapper">
-  <!-- Left: List Panel -->
-  <div class="desktop-left" id="desktopLeft">
-    <div class="header">
-      <div class="header-title">📋 Consultation Suggestions</div>
-      <div class="header-subtitle">Search conditions, view templates, copy to clipboard</div>
-    </div>
-    <div class="search-container">
-      <span class="search-icon">🔍</span>
-      <input class="search-input" id="searchInputDesktop" type="text" placeholder="Search conditions, symptoms, tests..." />
-      <span class="clear-btn" id="clearBtnDesktop" onclick="clearSearchDesktop()">✕</span>
-    </div>
+  <!-- Top: Full-width chips bar -->
+  <div class="desktop-chips-bar" id="desktopChipsBar">
     <div class="chips-scroll" id="chipsContainerDesktop"></div>
-    <div class="result-count" id="resultCountDesktop"></div>
-    <div class="list-container" id="listContainerDesktop">
-      <div class="empty-state" id="emptyStateDesktop">
-        <div class="empty-icon">🔍</div>
-        <div class="empty-title">No results found</div>
-        <div class="empty-subtitle">Try a different search term or category</div>
-      </div>
-    </div>
   </div>
-
-  <!-- Right: Detail Panel -->
-  <div class="desktop-right" id="desktopRight">
-    <!-- Placeholder when nothing selected -->
-    <div class="detail-placeholder" id="detailPlaceholder">
-      <div class="detail-placeholder-icon">📋</div>
-      <div class="detail-placeholder-text">Select a consultation</div>
-      <div class="detail-placeholder-sub">Choose from the list on the left to view details</div>
-    </div>
-    <!-- Detail content (hidden until selection) -->
-    <div class="detail-overlay" id="detailOverlayDesktop">
-      <div class="top-bar">
-        <div class="back-btn" onclick="closeDetailDesktop()">← Back</div>
-        <div class="top-bar-category" id="detailCategoryDesktop"></div>
-        <div style="min-width:60px"></div>
+  <!-- Panels row -->
+  <div class="desktop-panels">
+    <!-- Left: List Panel -->
+    <div class="desktop-left" id="desktopLeft">
+      <div class="header">
+        <div class="header-title">📋 Consultation Suggestions</div>
+        <div class="header-subtitle">Search conditions, view templates, copy to clipboard</div>
       </div>
-      <div class="detail-scroll" id="detailScrollDesktop">
-        <div class="detail-title" id="detailTitleDesktop"></div>
-        <div class="detail-updated" id="detailUpdatedDesktop"></div>
-        <div id="detailSectionsDesktop"></div>
-        <div class="disclaimer">
-          <div class="disclaimer-label">⚠️ Disclaimer</div>
-          <div class="disclaimer-text" id="detailDisclaimerDesktop"></div>
+      <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="searchInputDesktop" type="text" placeholder="Search conditions, symptoms, tests..." />
+        <span class="clear-btn" id="clearBtnDesktop" onclick="clearSearchDesktop()">✕</span>
+      </div>
+      <div class="result-count" id="resultCountDesktop"></div>
+      <div class="list-container" id="listContainerDesktop">
+        <div class="empty-state" id="emptyStateDesktop">
+          <div class="empty-icon">🔍</div>
+          <div class="empty-title">No results found</div>
+          <div class="empty-subtitle">Try a different search term or category</div>
         </div>
-        <button class="copy-btn" id="copyBtnDesktop" onclick="copyFullTextDesktop()">📋 Copy Consultation Text</button>
+      </div>
+    </div>
+    <!-- Right: Detail Panel -->
+    <div class="desktop-right" id="desktopRight">
+      <!-- Placeholder when nothing selected -->
+      <div class="detail-placeholder" id="detailPlaceholder">
+        <div class="detail-placeholder-icon">📋</div>
+        <div class="detail-placeholder-text">Select a consultation</div>
+        <div class="detail-placeholder-sub">Choose from the list on the left to view details</div>
+      </div>
+      <!-- Detail content (hidden until selection) -->
+      <div class="detail-overlay" id="detailOverlayDesktop">
+        <div class="top-bar">
+          <div class="back-btn" onclick="closeDetailDesktop()">← Back</div>
+          <div class="top-bar-category" id="detailCategoryDesktop"></div>
+          <div style="min-width:60px"></div>
+        </div>
+        <div class="detail-scroll" id="detailScrollDesktop">
+          <div class="detail-title" id="detailTitleDesktop"></div>
+          <div class="detail-updated" id="detailUpdatedDesktop"></div>
+          <div id="detailSectionsDesktop"></div>
+          <div class="disclaimer">
+            <div class="disclaimer-label">⚠️ Disclaimer</div>
+            <div class="disclaimer-text" id="detailDisclaimerDesktop"></div>
+          </div>
+          <button class="copy-btn" id="copyBtnDesktop" onclick="copyFullTextDesktop()">📋 Copy Consultation Text</button>
+        </div>
       </div>
     </div>
   </div>
