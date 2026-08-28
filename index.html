@@ -569,6 +569,42 @@
       background: var(--border);
       margin: 4px 12px;
     }
+
+    /* Favourite button */
+    .fav-btn {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: all 0.15s ease;
+      opacity: 0.4;
+    }
+    .fav-btn:hover { opacity: 1; background: #FFF3E0; }
+    .fav-btn.fav-active { opacity: 1; }
+    .fav-btn.fav-active:hover { background: #FFF3E0; }
+    
+    .desktop-left .fav-btn {
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+    }
+    
+    /* Favourites chip */
+    .chip.fav-chip {
+      background: #FFF8E1;
+      border-color: #FFD54F;
+      color: #F57F17;
+    }
+    .chip.fav-chip.active {
+      background: #FFD54F;
+      border-color: #F57F17;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -735,6 +771,34 @@ function renderRecentlyViewed(container, onClickFn, selectedIdx) {
     <div class="recently-viewed-divider"></div>`;
 }
 
+
+// ── Favourites ──
+let favourites = JSON.parse(localStorage.getItem('favourites') || '[]');
+
+function toggleFavourite(index, event) {
+  if (event) event.stopPropagation();
+  const idx = favourites.indexOf(index);
+  if (idx > -1) {
+    favourites.splice(idx, 1);
+  } else {
+    favourites.push(index);
+  }
+  localStorage.setItem('favourites', JSON.stringify(favourites));
+  renderChipsMobile();
+  renderChipsDesktop();
+  renderListMobile();
+  renderListDesktop();
+}
+
+function isFavourite(index) {
+  return favourites.includes(index);
+}
+
+function renderFavouriteBtn(index) {
+  const isFav = favourites.includes(index);
+  return `<div class="fav-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavourite(${index}, event)" title="${isFav ? 'Remove from favourites' : 'Add to favourites'}">${isFav ? '⭐' : '☆'}</div>`;
+}
+
 const isDesktop = () => window.innerWidth >= 1024;
 
 // ── Fuzzy search ──
@@ -748,7 +812,11 @@ function fuzzyMatch(query, text) {
 
 function searchEntries(query, category) {
   let results = DATA;
-  if (category) results = results.filter(e => e.category === category);
+  if (category === '__favourites__') {
+    results = DATA.filter((e, i) => favourites.includes(i));
+  } else if (category) {
+    results = results.filter(e => e.category === category);
+  }
   if (query.trim()) {
     results = results.filter(e => {
       const searchable = [e.disease_name, e.category, e.title, e.history, e.plan, e.consultation_sample].join(' ');
@@ -773,7 +841,7 @@ function categoryIcon(cat) {
 // ══════════════════════════════════════════════
 function renderChipsMobile() {
   const c = document.getElementById('chipsContainer');
-  let h = `<span class="chip ${selectedCategory === null ? 'active' : ''}" onclick="selectCategoryMobile(null)">All</span>`;
+  let h = `<span class="chip ${selectedCategory === null ? 'active' : ''}" onclick="selectCategoryMobile(null)">All</span><span class="chip fav-chip ${selectedCategory === '__favourites__' ? 'active' : ''}" onclick="selectCategoryMobile('__favourites__')">⭐ Favourites (${favourites.length})</span>`;
   CATEGORIES.forEach(cat => {
     h += `<span class="chip ${selectedCategory === cat.name ? 'active' : ''}" onclick="selectCategoryMobile('${cat.name.replace(/'/g,"\\'")}')">${cat.name} (${cat.count})</span>`;
   });
@@ -808,6 +876,7 @@ function renderListMobile() {
         <div class="card-title">${e.title || e.disease_name}</div>
         <div class="card-category">${e.category}</div>
       </div>
+      <div class="fav-btn ${favourites.includes(DATA.indexOf(e)) ? 'fav-active' : ''}" onclick="toggleFavourite(${DATA.indexOf(e)}, event)" title="${favourites.includes(DATA.indexOf(e)) ? 'Remove from favourites' : 'Add to favourites'}">${favourites.includes(DATA.indexOf(e)) ? '⭐' : '☆'}</div>
       <div class="card-chevron">›</div>
     </div>`).join('');
 }
@@ -839,7 +908,7 @@ function clearSearchMobile() {
 // ══════════════════════════════════════════════
 function renderChipsDesktop() {
   const c = document.getElementById('chipsContainerDesktop');
-  let h = `<span class="chip ${selectedDesktopCategory === null ? 'active' : ''}" onclick="selectCategoryDesktop(null)">All</span>`;
+  let h = `<span class="chip ${selectedDesktopCategory === null ? 'active' : ''}" onclick="selectCategoryDesktop(null)">All</span><span class="chip fav-chip ${selectedDesktopCategory === '__favourites__' ? 'active' : ''}" onclick="selectCategoryDesktop('__favourites__')">⭐ Favourites (${favourites.length})</span>`;
   CATEGORIES.forEach(cat => {
     h += `<span class="chip ${selectedDesktopCategory === cat.name ? 'active' : ''}" onclick="selectCategoryDesktop('${cat.name.replace(/'/g,"\\'")}')">${cat.name} (${cat.count})</span>`;
   });
@@ -874,6 +943,7 @@ function renderListDesktop() {
         <div class="card-title">${e.title || e.disease_name}</div>
         <div class="card-category">${e.category}</div>
       </div>
+      <div class="fav-btn ${favourites.includes(DATA.indexOf(e)) ? 'fav-active' : ''}" onclick="toggleFavourite(${DATA.indexOf(e)}, event)" title="${favourites.includes(DATA.indexOf(e)) ? 'Remove from favourites' : 'Add to favourites'}">${favourites.includes(DATA.indexOf(e)) ? '⭐' : '☆'}</div>
       <div class="card-chevron">›</div>
     </div>`).join('');
 }
