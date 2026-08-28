@@ -441,10 +441,28 @@
         padding: 6px 12px 4px;
         border-bottom: 1px solid #E0F2F1;
         background: #F0FDFA;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
       }
       .desktop-left .header-title {
         font-size: 14px;
       }
+      .home-btn {
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: background 0.15s;
+      }
+      .home-btn:hover { background: #0F766E; }
 
       .desktop-left .search-container {
         margin: 4px 8px 0;
@@ -533,6 +551,24 @@
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* Recently Viewed */
+    .recently-viewed-header {
+      padding: 6px 12px 2px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .recently-viewed-card {
+      border-left: 3px solid var(--primary) !important;
+    }
+    .recently-viewed-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 12px;
+    }
   </style>
 </head>
 <body>
@@ -598,8 +634,11 @@
     <!-- Left: List Panel -->
     <div class="desktop-left" id="desktopLeft">
       <div class="header">
-        <div class="header-title">📋 Consultation Suggestions</div>
-        <div class="header-subtitle">Search conditions, view templates, copy to clipboard</div>
+        <div>
+          <div class="header-title">📋 Consultation Suggestions</div>
+          <div class="header-subtitle">Search conditions, view templates, copy to clipboard</div>
+        </div>
+        <button class="home-btn" onclick="goHomeDesktop()">🏠 Home</button>
       </div>
       <div class="search-container">
         <span class="search-icon">🔍</span>
@@ -663,6 +702,39 @@ let currentEntryIndex = null;
 let selectedDesktopCategory = null;
 let currentDesktopEntryIndex = null;
 
+// ── Recently Viewed ──
+let recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+
+function trackRecentlyViewed(index) {
+  recentlyViewed = recentlyViewed.filter(i => i !== index);
+  recentlyViewed.unshift(index);
+  if (recentlyViewed.length > 10) recentlyViewed = recentlyViewed.slice(0, 10);
+  localStorage.setItem('recentlyViewed', JSON.stringify(recentlyViewed));
+}
+
+function renderRecentlyViewed(container, onClickFn, selectedIdx) {
+  if (recentlyViewed.length === 0) return '';
+  const entries = recentlyViewed
+    .map(i => DATA[i])
+    .filter(Boolean);
+  if (entries.length === 0) return '';
+  return `
+    <div class="recently-viewed-header">🕐 Recently Viewed</div>
+    ${entries.map((e, i) => {
+      const idx = recentlyViewed[i];
+      return `
+    <div class="card recently-viewed-card ${selectedIdx === idx ? 'selected' : ''}" onclick="${onClickFn}(${idx})" style="animation: fadeIn 0.2s ease ${i*0.02}s both">
+      <div class="card-icon">${categoryIcon(e.category)}</div>
+      <div class="card-text">
+        <div class="card-title">${e.title || e.disease_name}</div>
+        <div class="card-category">${e.category}</div>
+      </div>
+      <div class="card-chevron">›</div>
+    </div>`;
+    }).join('')}
+    <div class="recently-viewed-divider"></div>`;
+}
+
 const isDesktop = () => window.innerWidth >= 1024;
 
 // ── Fuzzy search ──
@@ -719,6 +791,7 @@ function renderListMobile() {
   const results = searchEntries(q, selectedCategory);
   const container = document.getElementById('listContainer');
   const countEl = document.getElementById('resultCount');
+  const showRecent = !q.trim() && !selectedCategory;
   countEl.textContent = `${results.length} result${results.length !== 1 ? 's' : ''}`;
   if (results.length === 0) {
     container.innerHTML = '';
@@ -727,7 +800,8 @@ function renderListMobile() {
     emp.style.display = 'block';
     return;
   }
-  container.innerHTML = results.map((e, i) => `
+  const recentHtml = showRecent ? renderRecentlyViewed(container, 'openDetailMobile', currentEntryIndex) : '';
+  container.innerHTML = recentHtml + results.map((e, i) => `
     <div class="card ${currentEntryIndex === DATA.indexOf(e) ? 'selected' : ''}" onclick="openDetailMobile(${DATA.indexOf(e)})" style="animation: fadeIn 0.2s ease ${i*0.03}s both">
       <div class="card-icon">${categoryIcon(e.category)}</div>
       <div class="card-text">
@@ -740,6 +814,7 @@ function renderListMobile() {
 
 function openDetailMobile(index) {
   currentEntryIndex = index;
+  trackRecentlyViewed(index);
   renderListMobile();
   const e = DATA[index];
   populateDetail(e, 'detailCategory', 'detailTitle', 'detailUpdated', 'detailDisclaimer', 'detailSections', 'copyBtn', 'detailScroll');
@@ -782,6 +857,7 @@ function renderListDesktop() {
   const results = searchEntries(q, selectedDesktopCategory);
   const container = document.getElementById('listContainerDesktop');
   const countEl = document.getElementById('resultCountDesktop');
+  const showRecent = !q.trim() && !selectedDesktopCategory;
   countEl.textContent = `${results.length} result${results.length !== 1 ? 's' : ''}`;
   if (results.length === 0) {
     container.innerHTML = '';
@@ -790,7 +866,8 @@ function renderListDesktop() {
     emp.style.display = 'block';
     return;
   }
-  container.innerHTML = results.map((e, i) => `
+  const recentHtml = showRecent ? renderRecentlyViewed(container, 'openDetailDesktop', currentDesktopEntryIndex) : '';
+  container.innerHTML = recentHtml + results.map((e, i) => `
     <div class="card ${currentDesktopEntryIndex === DATA.indexOf(e) ? 'selected' : ''}" onclick="openDetailDesktop(${DATA.indexOf(e)})" style="animation: fadeIn 0.2s ease ${i*0.02}s both">
       <div class="card-icon">${categoryIcon(e.category)}</div>
       <div class="card-text">
@@ -803,6 +880,7 @@ function renderListDesktop() {
 
 function openDetailDesktop(index) {
   currentDesktopEntryIndex = index;
+  trackRecentlyViewed(index);
   renderListDesktop();
   const e = DATA[index];
   populateDetail(e, 'detailCategoryDesktop', 'detailTitleDesktop', 'detailUpdatedDesktop', 'detailDisclaimerDesktop', 'detailSectionsDesktop', 'copyBtnDesktop', 'detailScrollDesktop');
@@ -816,6 +894,15 @@ function closeDetailDesktop() {
   document.getElementById('detailPlaceholder').style.display = '';
   currentDesktopEntryIndex = null;
   renderListDesktop();
+}
+
+function goHomeDesktop() {
+  closeDetailDesktop();
+  clearSearchDesktop();
+  activeCategory = null;
+  renderChipsDesktop();
+  renderListDesktop();
+  document.getElementById('searchInputDesktop').focus();
 }
 
 function clearSearchDesktop() {
