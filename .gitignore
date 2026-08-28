@@ -5,3 +5,7 @@ dist/
 scripts/add_entries.py
 scripts/rewrite_consultation_data.py
 data.js
+assets/consultation_data_clean.json
+assets/consultation_data_original_backup.json
+package-lock.json
+scripts/
