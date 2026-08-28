@@ -1,0 +1,27 @@
+{
+  "name": "consultation-suggestions",
+  "version": "1.0.0",
+  "description": "Clinical consultation suggestion library for primary care — 292 pre-formatted templates across 42 categories with fuzzy search and copy-to-clipboard.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "expo": ">=49.0.0",
+    "expo-clipboard": ">=4.0.0",
+    "react": ">=18.0.0",
+    "react-native": ">=0.72.0"
+  },
+  "dependencies": {
+    "fuse.js": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "src/",
+    "assets/"
+  ]
+}
