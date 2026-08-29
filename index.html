@@ -605,6 +605,235 @@
       border-color: #F57F17;
       color: #fff;
     }
+
+    /* AI Chat Bubble */
+    .chat-bubble {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #0D9488, #0F766E);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(13, 148, 136, 0.4);
+      z-index: 9999;
+      transition: all 0.3s ease;
+      animation: chatPulse 2s ease-in-out infinite;
+    }
+    .chat-bubble:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 30px rgba(13, 148, 136, 0.5);
+    }
+    .chat-bubble-icon { font-size: 24px; }
+    
+    @keyframes chatPulse {
+      0%, 100% { box-shadow: 0 4px 20px rgba(13, 148, 136, 0.4); }
+      50% { box-shadow: 0 4px 30px rgba(13, 148, 136, 0.6); }
+    }
+    
+    .chat-panel {
+      position: fixed;
+      bottom: 90px;
+      right: 24px;
+      width: 400px;
+      height: 520px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.2);
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid #E8E8ED;
+      animation: chatSlideUp 0.3s ease;
+    }
+    .chat-panel.open { display: flex; }
+    
+    @keyframes chatSlideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .chat-header {
+      background: linear-gradient(135deg, #0D9488, #0F766E);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chat-header-info { display: flex; align-items: center; gap: 10px; }
+    .chat-header-icon { font-size: 20px; }
+    .chat-header-title { color: white; font-size: 14px; font-weight: 700; }
+    .chat-header-subtitle { color: rgba(255,255,255,0.8); font-size: 10px; }
+    .chat-header-actions { display: flex; gap: 4px; }
+    .chat-action-btn, .chat-close-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .chat-action-btn:hover, .chat-close-btn:hover { background: rgba(255,255,255,0.3); }
+    
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+    
+    .chat-msg {
+      display: flex;
+      gap: 8px;
+      max-width: 95%;
+      animation: msgFadeIn 0.3s ease;
+    }
+    .chat-msg.user { flex-direction: row-reverse; align-self: flex-end; }
+    
+    @keyframes msgFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .chat-msg-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #F0F0F5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .chat-msg.user .chat-msg-avatar { background: #0D9488; }
+    
+    .chat-msg-content {
+      background: #F0F0F5;
+      border-radius: 12px;
+      padding: 10px 14px;
+    }
+    .chat-msg.user .chat-msg-content {
+      background: #0D9488;
+      color: white;
+    }
+    .chat-msg-text { font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+    
+    .chat-msg-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .chat-suggestion {
+      padding: 4px 10px;
+      background: white;
+      border: 1px solid #E0E0E5;
+      border-radius: 12px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .chat-suggestion:hover {
+      background: #0D9488;
+      color: white;
+      border-color: #0D9488;
+    }
+    
+    .chat-copy-btn {
+      margin-top: 8px;
+      padding: 4px 10px;
+      background: #0D9488;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .chat-copy-btn:hover { background: #0F766E; }
+    
+    .chat-typing {
+      display: flex;
+      gap: 4px;
+      padding: 4px 0;
+    }
+    .chat-typing span {
+      width: 6px;
+      height: 6px;
+      background: #999;
+      border-radius: 50%;
+      animation: typingDot 1.4s infinite;
+    }
+    .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes typingDot {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+    
+    .chat-input-area {
+      padding: 8px 12px;
+      border-top: 1px solid #F0F0F5;
+      background: white;
+    }
+    .chat-input-wrapper {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .chat-input {
+      flex: 1;
+      border: 1px solid #E0E0E5;
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 13px;
+      outline: none;
+      font-family: inherit;
+    }
+    .chat-input:focus { border-color: #0D9488; }
+    .chat-send-btn {
+      width: 36px;
+      height: 36px;
+      background: #0D9488;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .chat-send-btn:hover { background: #0F766E; }
+    
+    .chat-disclaimer {
+      font-size: 9px;
+      color: #999;
+      text-align: center;
+      padding: 4px 12px;
+      background: #FAFAFA;
+      border-top: 1px solid #F0F0F5;
+    }
   </style>
 </head>
 <body>
@@ -717,6 +946,49 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+
+<!-- AI Chat Bubble -->
+<div class="chat-bubble" id="chatBubble" onclick="toggleChat()">
+  <span class="chat-bubble-icon">🤖</span>
+</div>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-header">
+    <div class="chat-header-info">
+      <span class="chat-header-icon">🤖</span>
+      <div>
+        <div class="chat-header-title">Clinical Assistant</div>
+        <div class="chat-header-subtitle">Ask about conditions, treatments, or generate consultations</div>
+      </div>
+    </div>
+    <div class="chat-header-actions">
+      <button class="chat-action-btn" onclick="clearChat()" title="Clear chat">🗑️</button>
+      <button class="chat-close-btn" onclick="toggleChat()" title="Close">✕</button>
+    </div>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-msg bot">
+      <div class="chat-msg-avatar">🤖</div>
+      <div class="chat-msg-content">
+        <div class="chat-msg-text">Hello! I'm your Clinical Assistant. I can help you with:</div>
+        <div class="chat-msg-suggestions">
+          <span class="chat-suggestion" onclick="sendSuggestion('Generate a consultation for community acquired pneumonia')">📝 CAP Consultation</span>
+          <span class="chat-suggestion" onclick="sendSuggestion('What is the treatment for cellulitis?')">💊 Cellulitis Treatment</span>
+          <span class="chat-suggestion" onclick="sendSuggestion('Generate a ward round template for dementia')">🏥 Dementia Ward Round</span>
+          <span class="chat-suggestion" onclick="sendSuggestion('What antibiotics for UTI in elderly?')">💉 UTI Antibiotics</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chat-input-area">
+    <div class="chat-input-wrapper">
+      <input class="chat-input" id="chatInput" type="text" placeholder="Ask about conditions, treatments..." onkeypress="if(event.key==='Enter')sendMessage()" />
+      <button class="chat-send-btn" onclick="sendMessage()">➤</button>
+    </div>
+    <div class="chat-disclaimer">⚠️ AI suggestions are for clinical guidance only. Always verify with BNF, NICE guidelines, and local protocols.</div>
   </div>
 </div>
 
@@ -1182,6 +1454,158 @@ function showInteractionWarnings(warnings) {
   
   document.body.appendChild(modal);
   modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+}
+
+
+// ── AI Chat Bubble ──
+function toggleChat() {
+  const panel = document.getElementById('chatPanel');
+  const bubble = document.getElementById('chatBubble');
+  panel.classList.toggle('open');
+  bubble.style.display = panel.classList.contains('open') ? 'none' : 'flex';
+  if (panel.classList.contains('open')) {
+    document.getElementById('chatInput').focus();
+  }
+}
+
+function clearChat() {
+  const msgs = document.getElementById('chatMessages');
+  msgs.innerHTML = `<div class="chat-msg bot">
+    <div class="chat-msg-avatar">🤖</div>
+    <div class="chat-msg-content">
+      <div class="chat-msg-text">Chat cleared. How can I help you?</div>
+    </div>
+  </div>`;
+}
+
+function sendSuggestion(text) {
+  document.getElementById('chatInput').value = text;
+  sendMessage();
+}
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  input.value = '';
+  addMessage(text, 'user');
+  
+  // Show typing indicator
+  const typingId = showTyping();
+  
+  // Process after delay for natural feel
+  setTimeout(() => {
+    removeTyping(typingId);
+    const response = generateResponse(text);
+    addBotMessage(response);
+  }, 800 + Math.random() * 1200);
+}
+
+function addMessage(text, type) {
+  const msgs = document.getElementById('chatMessages');
+  const avatar = type === 'user' ? '👨‍⚕️' : '🤖';
+  msgs.innerHTML += `
+    <div class="chat-msg ${type}">
+      <div class="chat-msg-avatar">${avatar}</div>
+      <div class="chat-msg-content">
+        <div class="chat-msg-text">${text}</div>
+      </div>
+    </div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addBotMessage(response) {
+  const msgs = document.getElementById('chatMessages');
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'chat-msg bot';
+  msgDiv.innerHTML = `
+    <div class="chat-msg-avatar">🤖</div>
+    <div class="chat-msg-content">
+      <div class="chat-msg-text">${response.text}</div>
+      <button class="chat-copy-btn" onclick="copyFromMsg(this)">📋 Copy</button>
+      ${response.suggestions ? `<div class="chat-msg-suggestions">${response.suggestions.map(s => `<span class="chat-suggestion" onclick="sendSuggestion('${s}')">${s}</span>`).join('')}</div>` : ''}
+    </div>`;
+  msgs.appendChild(msgDiv);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function copyFromMsg(btn) {
+  const text = btn.parentElement.querySelector('.chat-msg-text').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy', 2000);
+  });
+}
+
+
+
+function showTyping() {
+  const msgs = document.getElementById('chatMessages');
+  const id = 'typing-' + Date.now();
+  msgs.innerHTML += `
+    <div class="chat-msg bot" id="${id}">
+      <div class="chat-msg-avatar">🤖</div>
+      <div class="chat-msg-content">
+        <div class="chat-typing"><span></span><span></span><span></span></div>
+      </div>
+    </div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  return id;
+}
+
+function removeTyping(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function generateResponse(query) {
+  const q = query.toLowerCase();
+  
+  // Search existing data for relevant entries
+  const matches = DATA.filter(e => {
+    const searchable = [e.disease_name, e.category, e.title, e.history, e.plan, e.consultation_sample].join(' ').toLowerCase();
+    const words = q.split(/\s+/).filter(w => w.length > 2);
+    return words.some(w => searchable.includes(w));
+  });
+  
+  // If we found relevant entries, provide consultation template
+  if (matches.length > 0) {
+    const best = matches[0];
+    return {
+      text: `Based on your query about <strong>${query}</strong>, here's the most relevant template:\n\n<strong>${best.title || best.disease_name}</strong>\nCategory: ${best.category}\n\n${best.consultation_sample || best.history}`,
+      copyText: best.consultation_sample || best.history,
+      suggestions: matches.slice(1, 4).map(m => `Tell me about ${m.disease_name}`)
+    };
+  }
+  
+  // If no matches, provide general guidance
+  if (q.includes('consultation') || q.includes('template')) {
+    return {
+      text: `I can help generate consultation templates. Please be more specific about the condition or specialty. For example:\n\n• "Generate a consultation for asthma exacerbation"\n• "Create a ward round template for diabetes review"\n• "What should I ask about chest pain?"`,
+      suggestions: ['Chest Pain Consultation', 'Diabetes Ward Round', 'Asthma Exacerbation']
+    };
+  }
+  
+  if (q.includes('treatment') || q.includes('management') || q.includes('prescribe')) {
+    return {
+      text: `For treatment guidance, I recommend checking:\n\n• <strong>BNF</strong> (British National Formulary) for dosing\n• <strong>NICE guidelines</strong> for evidence-based pathways\n• <strong>Local formulary</strong> for area-specific guidance\n\nWould you like me to find a specific treatment template from our library?`,
+      suggestions: ['Antibiotic prescribing', 'Pain management', 'Diabetes medications']
+    };
+  }
+  
+  if (q.includes('dose') || q.includes('drug') || q.includes('medication')) {
+    return {
+      text: `For medication dosing, always verify with the current BNF. Common reminders:\n\n• <strong>Renal impairment</strong>: Check eGFR and adjust doses\n• <strong>Elderly</strong>: Start low, go slow\n• <strong>Hepatic impairment</strong>: Many drugs need dose reduction\n• <strong>Drug interactions</strong>: Use the interaction checker on copy`,
+      suggestions: ['BPH medications', 'Antibiotic dosing', 'Pain medication review']
+    };
+  }
+  
+  // Default response
+  return {
+    text: `I found ${matches.length} potentially relevant entries in our library. Try being more specific with your query, for example:\n\n• Name a specific condition (e.g., "cellulitis", "Parkinson's", "diabetes")\n• Ask about a specialty (e.g., "cardiology ward round")\n• Request a template type (e.g., "generate consultation for...")`,
+    suggestions: ['Care Home Ward Round', 'Cardiology Review', 'Infection Management']
+  };
 }
 
 </script>
