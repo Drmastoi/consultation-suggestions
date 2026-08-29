@@ -1560,51 +1560,62 @@ function removeTyping(id) {
 }
 
 function generateResponse(query) {
-  const q = query.toLowerCase();
+  const q = query.toLowerCase().trim();
   
-  // Search existing data for relevant entries
-  const matches = DATA.filter(e => {
-    const searchable = [e.disease_name, e.category, e.title, e.history, e.plan, e.consultation_sample].join(' ').toLowerCase();
-    const words = q.split(/\s+/).filter(w => w.length > 2);
-    return words.some(w => searchable.includes(w));
-  });
+  // Stopwords to ignore in search
+  const stopwords = ['the', 'and', 'for', 'with', 'what', 'how', 'can', 'you', 'tell', 'about', 'generate', 'create', 'make', 'give', 'show', 'find', 'search', 'look', 'get', 'need', 'want', 'please', 'help', 'template', 'consultation', 'ward', 'round', 'review', 'assessment', 'management', 'treatment', 'plan', 'care', 'check'];
   
-  // If we found relevant entries, provide consultation template
-  if (matches.length > 0) {
-    const best = matches[0];
+  // Extract meaningful keywords (3+ chars, not stopwords)
+  const keywords = q.split(/\s+/).filter(w => w.length > 2 && !stopwords.includes(w));
+  
+  // Score each entry by keyword matches
+  const scored = DATA.map((e, idx) => {
+    const name = (e.disease_name || '').toLowerCase();
+    const title = (e.title || '').toLowerCase();
+    const cat = (e.category || '').toLowerCase();
+    
+    let score = 0;
+    
+    // Exact disease name match (highest priority)
+    if (name.includes(q) || title.includes(q)) score += 100;
+    
+    // Partial name/title match
+    keywords.forEach(kw => {
+      if (name.includes(kw)) score += 10;
+      if (title.includes(kw)) score += 8;
+      if (cat.includes(kw)) score += 5;
+    });
+    
+    // Keyword match in name (highest relevance)
+    keywords.forEach(kw => {
+      if (name.split(/\s+/).some(n => n.startsWith(kw))) score += 15;
+    });
+    
+    return { entry: e, idx, score };
+  }).filter(s => s.score > 0)
+    .sort((a, b) => b.score - a.score);
+  
+  if (scored.length > 0) {
+    const best = scored[0].entry;
+    const others = scored.slice(1, 5).map(s => s.entry);
+    
     return {
-      text: `Based on your query about <strong>${query}</strong>, here's the most relevant template:\n\n<strong>${best.title || best.disease_name}</strong>\nCategory: ${best.category}\n\n${best.consultation_sample || best.history}`,
-      copyText: best.consultation_sample || best.history,
-      suggestions: matches.slice(1, 4).map(m => `Tell me about ${m.disease_name}`)
+      text: `📋 <strong>${best.title || best.disease_name}</strong>\nCategory: ${best.category}\n\n${best.consultation_sample || best.history}`,
+      suggestions: others.map(m => m.disease_name)
     };
   }
   
-  // If no matches, provide general guidance
-  if (q.includes('consultation') || q.includes('template')) {
+  // No matches - provide helpful guidance
+  if (q.includes('treatment') || q.includes('prescribe') || q.includes('drug') || q.includes('medication') || q.includes('dose')) {
     return {
-      text: `I can help generate consultation templates. Please be more specific about the condition or specialty. For example:\n\n• "Generate a consultation for asthma exacerbation"\n• "Create a ward round template for diabetes review"\n• "What should I ask about chest pain?"`,
-      suggestions: ['Chest Pain Consultation', 'Diabetes Ward Round', 'Asthma Exacerbation']
+      text: `For treatment guidance, I recommend checking:\n\n• <strong>BNF</strong> (British National Formulary) for dosing\n• <strong>NICE guidelines</strong> for evidence-based pathways\n• <strong>Local formulary</strong> for area-specific guidance\n\nTry naming a specific condition for a consultation template.`,
+      suggestions: ['Cellulitis treatment', 'UTI antibiotics', 'Diabetes medications']
     };
   }
   
-  if (q.includes('treatment') || q.includes('management') || q.includes('prescribe')) {
-    return {
-      text: `For treatment guidance, I recommend checking:\n\n• <strong>BNF</strong> (British National Formulary) for dosing\n• <strong>NICE guidelines</strong> for evidence-based pathways\n• <strong>Local formulary</strong> for area-specific guidance\n\nWould you like me to find a specific treatment template from our library?`,
-      suggestions: ['Antibiotic prescribing', 'Pain management', 'Diabetes medications']
-    };
-  }
-  
-  if (q.includes('dose') || q.includes('drug') || q.includes('medication')) {
-    return {
-      text: `For medication dosing, always verify with the current BNF. Common reminders:\n\n• <strong>Renal impairment</strong>: Check eGFR and adjust doses\n• <strong>Elderly</strong>: Start low, go slow\n• <strong>Hepatic impairment</strong>: Many drugs need dose reduction\n• <strong>Drug interactions</strong>: Use the interaction checker on copy`,
-      suggestions: ['BPH medications', 'Antibiotic dosing', 'Pain medication review']
-    };
-  }
-  
-  // Default response
   return {
-    text: `I found ${matches.length} potentially relevant entries in our library. Try being more specific with your query, for example:\n\n• Name a specific condition (e.g., "cellulitis", "Parkinson's", "diabetes")\n• Ask about a specialty (e.g., "cardiology ward round")\n• Request a template type (e.g., "generate consultation for...")`,
-    suggestions: ['Care Home Ward Round', 'Cardiology Review', 'Infection Management']
+    text: `I couldn't find a match for "<strong>${query}</strong>". Try:\n\n• A specific condition name (e.g., "cellulitis", "asthma", "diabetes")\n• A specialty (e.g., "cardiology", "dermatology")\n• A setting (e.g., "care home ward round", "discharge review")`,
+    suggestions: ['Cellulitis', 'Asthma', 'Diabetes Ward Round', 'Care Home Ward Round']
   };
 }
 
